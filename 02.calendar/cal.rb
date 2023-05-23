@@ -4,7 +4,7 @@ require 'date'
 require 'optparse'
 
 class Calendar
-  def initialize(year, month)
+  def initialize(year = Date.today.year, month = Date.today.month)
     @year = year
     @month = month
     @last_day = Date.new(@year, @month, -1)
@@ -69,7 +69,7 @@ class Calendar
         @days.unshift('   ')
       when "Tue"
         @days.unshift('   ', '   ')
-      when "wed"
+      when "Wed"
         @days.unshift('   ', '   ', '   ')
       when "Thu"
         @days.unshift('   ', '   ', '   ','   ')
@@ -90,4 +90,6 @@ opt.on('-m VAL'){ |month|
   option[:month] = month.to_i
 }
 opt.parse!(ARGV)
-Calendar.new(option[:year], option[:month]).print_result
+year = option[:year] || Date.today.year
+month = option[:month] || Date.today.month
+Calendar.new(year, month).print_result
