@@ -6,7 +6,8 @@ while n <= 20
     puts "Fizz"
   elsif n % 5 == 0
     puts "Buzz"
-  else puts n
+  else 
+    puts n
   end
   n += 1
 end
