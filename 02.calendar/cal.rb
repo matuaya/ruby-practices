@@ -12,7 +12,7 @@ class Calendar
   end
 
   def print_result
-    number_of_days
+    @days = (@first_day.day..@last_day.day).to_a
     what_day
     show_month_year
     show_week
@@ -21,10 +21,8 @@ class Calendar
       count += 1
       if day.class == String
         print day
-      elsif day < 10
-        print "#{day}  "
       else 
-        print "#{day} "
+        print day.to_s.rjust(3)
       end
       if count % 7 == 0
         puts "\n"
@@ -40,45 +38,13 @@ class Calendar
 
   def show_week
     week = ["日", "月", "火", "水", "木", "金", "土"]
-    week.each do |day|
-      print "#{day} "
-    end
-    puts "\n"
-  end
-
-  def number_of_days
-    @days = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-      11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-      21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
-    case @last_day.day
-      when 30
-        @days
-      when 31
-        @days.push(31)
-      when 28
-        @days.pop(2)
-      when 29
-        @days.pop
-    end
+    puts " #{week.join(' ')}"
   end
 
   def what_day
-    day = @first_day.strftime('%a')
-    case day
-      when "Mon"
-        @days.unshift('   ')
-      when "Tue"
-        @days.unshift('   ', '   ')
-      when "Wed"
-        @days.unshift('   ', '   ', '   ')
-      when "Thu"
-        @days.unshift('   ', '   ', '   ','   ')
-      when "Fri"
-        @days.unshift('   ', '   ', '   ', '   ', '   ')
-      when "Sat"
-        @days.unshift('   ', '   ', '   ','    ', '   ', '   ')
-    end
-  end
+    number = @first_day.wday
+    @days = ['   '] * number + @days
+  end 
 end
 
 opt = OptionParser.new
