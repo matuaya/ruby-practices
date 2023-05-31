@@ -12,28 +12,22 @@ class Calendar
   end
 
   def print_result
-    @days = (@first_day.day..@last_day.day).to_a
-    what_day
     show_month_year
     show_week
-    count = 0
+    number_of_blanks
+
+    @days = (@first_day.day..@last_day.day).to_a
     @days.each do |day|
-      count += 1
-      if day.class == String
-        print day
-      else 
-        print day.to_s.rjust(3)
-      end
-      if count % 7 == 0
-        puts "\n"
+      print day.to_s.rjust(3)
+      if Date.new(@year, @month, day).wday == 6
+          puts "\n"
       end
     end
     puts "\n"
   end
   
   def show_month_year
-    print "      #{@month}月 #{@year}"
-    puts "\n"
+    puts "       #{@month}月 #{@year}"
   end
 
   def show_week
@@ -41,10 +35,9 @@ class Calendar
     puts " #{week.join(' ')}"
   end
 
-  def what_day
-    number = @first_day.wday
-    @days = ['   '] * number + @days
-  end 
+  def number_of_blanks
+    print '   '* @first_day.wday
+  end
 end
 
 opt = OptionParser.new
