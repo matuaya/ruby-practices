@@ -4,6 +4,7 @@ require 'date'
 require 'optparse'
 
 class Calendar
+  WEEK = ["日", "月", "火", "水", "木", "金", "土"]
   def initialize(year = Date.today.year, month = Date.today.month)
     @year = year
     @month = month
@@ -16,14 +17,10 @@ class Calendar
     show_week
     number_of_blanks
 
-    @days = (@first_day.day..@last_day.day).to_a
-    @days.each do |day|
-      print day.to_s.rjust(3)
-      if Date.new(@year, @month, day).wday == 6
-          puts "\n"
-      end
+    (@first_day..@last_day).each do |date|
+      print date.day.to_s.rjust(3)
+      puts if date.wday == 6
     end
-    puts "\n"
   end
   
   def show_month_year
@@ -31,8 +28,7 @@ class Calendar
   end
 
   def show_week
-    week = ["日", "月", "火", "水", "木", "金", "土"]
-    puts " #{week.join(' ')}"
+    puts " #{ WEEK.join(' ')}"
   end
 
   def number_of_blanks
