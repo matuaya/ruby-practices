@@ -33,7 +33,7 @@ def slice_contents(contents, row_count)
   end
   # 次のプロセスに必要な配列の数が足りていない場合追加格納する
   min_required_arrays = 3
-  (min_required_arrays - divided_contents.size).times do |array|
+  (min_required_arrays - divided_contents.size).times do
     divided_contents << []
   end
   divided_contents
