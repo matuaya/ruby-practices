@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-COLUMNS = 3
+COLUMNS = 4
 
 def display_contents(dir)
   contents = modified_contents(dir)
@@ -55,6 +55,7 @@ def display(contents_rearranged)
       print content
       puts if i + 1 == (contents_count.to_f / 2).ceil
     end
+    puts
   else
     contents_rearranged.each_with_index do |content, i|
       print content
