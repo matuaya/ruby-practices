@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-COLUMNS = 4
+COLUMNS = 3
 
 def display_contents(dir)
   contents = modified_contents(dir)
@@ -50,16 +50,12 @@ def display(contents_rearranged)
   end
   # 2列表示される場合の計算
   # 2列表示に必要な最大コンテンツ数を算出して、適切な場所で改行する
-  if contents_count <= (COLUMNS * 2) - 2
-    contents_rearranged.each_with_index do |content, i|
-      print content
-      puts if i + 1 == (contents_count.to_f / 2).ceil
-    end
-    puts
-  else
-    contents_rearranged.each_with_index do |content, i|
-      print content
-      puts if ((i + 1) % COLUMNS).zero?
+  contents_rearranged.each_with_index do |content, i|
+    print content
+    if contents_count <= (COLUMNS * 2) - 2
+      puts if i + 1 == (contents_count.to_f / 2).ceil || i + 1 == contents_rearranged.size
+    else
+      puts if (i + 1) % COLUMNS == 0
     end
   end
 end
