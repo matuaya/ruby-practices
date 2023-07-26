@@ -1,20 +1,26 @@
 # frozen_string_literal: true
 
+require 'optparse'
+
 COLUMNS = 3
 
-def display_contents(dir)
-  contents = modified_contents(dir)
+def display_contents(dir, option)
+  contents = modified_contents(dir, option)
   row = calculate_rows(contents)
   contents_rearranged = rearrange_contents(row, contents)
   display(contents_rearranged)
 end
 
-def modified_contents(dir)
-  # 隠しファイルを排除
-  filtered_contents = Dir.children(dir).sort.reject { |content| File.fnmatch('.*', content) }
+def modified_contents(dir, option)
+  contents = if option[:a]
+               Dir.entries(dir).sort
+             else
+               # 隠しファイルを排除
+               Dir.children(dir).sort.reject { |content| File.fnmatch('.*', content) }
+             end
   # ファイル名の長さに応じてパディングの度合いを変える
-  longest = filtered_contents.max_by(&:length).length
-  filtered_contents.map do |content|
+  longest = contents.max_by(&:length).length
+  contents.map do |content|
     "#{content.ljust(longest)}    "
   end
 end
@@ -55,10 +61,16 @@ def display(contents_rearranged)
     if contents_count <= (COLUMNS * 2) - 2
       puts if i + 1 == (contents_count.to_f / 2).ceil || i + 1 == contents_rearranged.size
     else
-      puts if (i + 1) % COLUMNS == 0
+      puts if ((i + 1) % COLUMNS).zero?
     end
   end
 end
 
+option = {}
+opt = OptionParser.new
+opt.on('-a') { |v| option[:a] = v }
+opt.parse!(ARGV)
+
 dir = ARGV[0] || '.'
-display_contents(dir)
+
+display_contents(dir, option)
