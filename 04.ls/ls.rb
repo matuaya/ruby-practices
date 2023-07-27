@@ -5,23 +5,33 @@ require 'optparse'
 COLUMNS = 3
 
 def display_contents(dir, option)
-  contents = modified_contents(dir, option)
+  original_contents = modified_contents(dir, option)
+  contents = align_padded_contents(original_contents, option)
   row = calculate_rows(contents)
   contents_rearranged = rearrange_contents(row, contents)
   display(contents_rearranged)
 end
 
 def modified_contents(dir, option)
-  contents = if option[:a]
-               Dir.entries(dir).sort
-             else
-               # 隠しファイルを排除
-               Dir.children(dir).sort.reject { |content| File.fnmatch('.*', content) }
-             end
+  if option[:a]
+    Dir.entries(dir).sort
+  else
+    # 隠しファイルを排除
+    Dir.children(dir).sort.reject { |content| File.fnmatch('.*', content) }
+  end
+end
+
+def align_padded_contents(original_contents, option)
   # ファイル名の長さに応じてパディングの度合いを変える
-  longest = contents.max_by(&:length).length
-  contents.map do |content|
-    "#{content.ljust(longest)}    "
+  longest = original_contents.max_by(&:length).length
+  if option [:r]
+    original_contents.reverse.map do |content|
+      "#{content.ljust(longest)}    "
+    end
+  else
+    original_contents.map do |content|
+      "#{content.ljust(longest)}    "
+    end
   end
 end
 
@@ -69,6 +79,7 @@ end
 option = {}
 opt = OptionParser.new
 opt.on('-a') { |v| option[:a] = v }
+opt.on('-r') { |v| option[:r] = v }
 opt.parse!(ARGV)
 
 dir = ARGV[0] || '.'
