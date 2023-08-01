@@ -13,12 +13,17 @@ end
 
 def get_file_list(dir, option)
   sorted_contents = Dir.entries(dir).sort
+  sorted_contents_wihtout_hidden = sorted_contents.reject { |content| File.fnmatch('.*', content) }
   if option[:a]
-    sorted_contents
+    if option[:r]
+      sorted_contents.reverse
+    else
+      sorted_contents
+    end
   elsif option[:r]
-    sorted_contents.reverse.reject { |content| File.fnmatch('.*', content) }
+    sorted_contents_wihtout_hidden.reverse
   else
-    sorted_contents.reject { |content| File.fnmatch('.*', content) }
+    sorted_contents_wihtout_hidden
   end
 end
 
