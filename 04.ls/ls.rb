@@ -13,16 +13,15 @@ end
 
 def get_file_list(dir, option)
   sorted_contents = Dir.entries(dir).sort
-  sorted_contents_without_hidden = sorted_contents.reject { |content| File.fnmatch('.*', content) }
-
-  if option[:r]
-    return sorted_contents.reverse if option[:a]
-    return sorted_contents_without_hidden.reverse
-  end
+  displayable_contents = sorted_contents.reject { |content| File.fnmatch('.*', content) }
+ 
   if option[:a]
-    return sorted_contents
+    displayable_contents = sorted_contents
   end
-  sorted_contents_without_hidden
+  if option[:r]
+    displayable_contents = displayable_contents.reverse
+  end
+  displayable_contents
 end
 
 def format_file_list(original_contents)
