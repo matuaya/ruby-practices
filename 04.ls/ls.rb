@@ -1,33 +1,37 @@
 # frozen_string_literal: true
 
+FILE_TYPE = { '10' => '-', '12' => 'l', '14' => 's', '01' => 'p',
+              '02' => 'c', '04' => 'd', '06' => 'b' }.freeze
+
+PERMISSIONS = { '0' => '---', '1' => '--x', '2' => '-w-', '3' => '-wx',
+                '4' => 'r--', '5' => 'r-x', '6' => 'rw-', '7' => 'rwx' }.freeze
+
 require 'optparse'
+require 'etc'
+
 COLUMNS = 3
 
 def display_contents(dir, option)
-  original_contents = get_file_list(dir, option)
-  contents = format_file_list(original_contents)
+  file_names = file_names(dir, option)
+  return display_with_information(file_names, dir) if option[:l]
+
+  contents = format_file_list(file_names)
   row = calculate_rows(contents)
   contents_rearranged = rearrange_contents(row, contents)
   display(contents_rearranged)
 end
 
-def get_file_list(dir, option)
-  sorted_contents = Dir.entries(dir).sort
-  displayable_contents = sorted_contents.reject { |content| File.fnmatch('.*', content) }
- 
-  if option[:a]
-    displayable_contents = sorted_contents
-  end
-  if option[:r]
-    displayable_contents = displayable_contents.reverse
-  end
-  displayable_contents
+def file_names(dir, option)
+  file_names = Dir.entries(dir).sort
+  file_names = file_names.reverse if option[:r]
+  file_names = file_names.reject { |content| File.fnmatch('.*', content) } unless option[:a]
+  file_names
 end
 
-def format_file_list(original_contents)
+def format_file_list(file_names)
   # ファイル名の長さに応じてパディングの度合いを変える
-  longest = original_contents.max_by(&:length).length
-  original_contents.map do |content|
+  longest = file_names.max_by(&:length).length
+  file_names.map do |content|
     "#{content.ljust(longest)}    "
   end
 end
@@ -73,10 +77,97 @@ def display(contents_rearranged)
   end
 end
 
+def display_with_information(file_names, dir)
+  Dir.chdir(dir)
+  inode_values, lstat_mode_values, nlink_counts, file_size, block_counts = file_attributes(file_names)
+  print_block_count(block_counts)
+
+  file_names.each do |content|
+    lstat_mode = format('%06o', File.lstat(content).mode)
+    print_file_type(lstat_mode)
+    print_permissions(lstat_mode)
+    print_number_of_links(content, nlink_counts)
+    print_names(content)
+    print_contents_size(content, file_size)
+    print_last_accessed_time(content)
+    print_content_names(content, lstat_mode_values, inode_values, lstat_mode)
+  end
+end
+
+def print_block_count(block_counts)
+  total_block_count = block_counts.sum
+  puts "total #{total_block_count}"
+end
+
+def file_attributes(file_names)
+  inode_values = {}
+  lstat_mode_values = {}
+  nlink_counts = []
+  file_size = []
+  block_counts = []
+
+  file_names.each do |content|
+    file_information = File.stat(content)
+    inode_values[content] = file_information.ino.to_s
+    lstat_mode_values[content] = File.lstat(content).mode.to_s(8)
+    nlink_counts << file_information.nlink.to_s
+    file_size << file_information.size.to_s
+    block_counts << file_information.blocks
+  end
+  [inode_values, lstat_mode_values, nlink_counts, file_size, block_counts]
+end
+
+def print_file_type(lstat_mode)
+  file_type = lstat_mode.slice(0, 2)
+  print(FILE_TYPE[file_type])
+end
+
+def print_permissions(lstat_mode)
+  permissions = lstat_mode.slice(-3, 3).chars.to_a
+  permissions.each_with_index do |n, i|
+    print(PERMISSIONS[n])
+    print '  ' if i == 2
+  end
+end
+
+def print_names(content)
+  ids = [File.stat(content).uid, File.stat(content).gid]
+  print "#{Etc.getpwuid(ids[0]).name}  #{Etc.getgrgid(ids[1]).name}  "
+end
+
+def print_number_of_links(content, nlink_counts)
+  biggest_number = nlink_counts.max_by(&:length).length
+  print "#{File.stat(content).nlink.to_s.rjust(biggest_number)} "
+end
+
+def print_contents_size(content, file_size)
+  biggest_number = file_size.max_by(&:length).length
+  print "#{File.stat(content).size.to_s.rjust(biggest_number)} "
+end
+
+def print_last_accessed_time(content)
+  print "#{File.stat(content).mtime.strftime('%_m %_d %H:%M')} "
+end
+
+# シンボリックファイルに矢印をつける
+def print_content_names(content, lstat_mode_values, inode_values, lstat_mode)
+  current_lmode = lstat_mode
+  current_inode = File.stat(content).ino.to_s
+  matched_inode = inode_values.select { |_file, id| id == current_inode }
+  if current_lmode.start_with?('12')
+    matched_inode.each do |file, _id|
+      puts "#{content} -> #{file}" if !lstat_mode_values[file].start_with?('12')
+    end
+  else
+    puts content
+  end
+end
+
 option = {}
 opt = OptionParser.new
 opt.on('-a') { |v| option[:a] = v }
 opt.on('-r') { |v| option[:r] = v }
+opt.on('-l') { |v| option[:l] = v }
 opt.parse!(ARGV)
 
 dir = ARGV[0] || '.'
