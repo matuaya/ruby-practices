@@ -86,26 +86,18 @@ def display_with_information(file_names, dir)
 
   file_names.each do |file_name|
     lstat_mode = format('%06o', File.lstat(file_name).mode)
-    print "#{file_type(lstat_mode)}#{permissions(lstat_mode)}  #{number_of_links(file_name, width_nlink)} "\
-          "#{names(file_name)}  #{file_size(file_name, width_size)} #{last_accessed_time(file_name)} "
+    print "#{file_type(lstat_mode)}#{permissions(lstat_mode)}  #{number_of_links(file_name).rjust(width_nlink)} "\
+          "#{names(file_name)}  #{file_size(file_name).rjust(width_size)} #{last_accessed_time(file_name)} "
     puts files_and_symlinks(file_name)
   end
 end
 
 def calculate_width_file_size(file_names)
-  file_size = []
-  file_names.each do |file_name|
-    file_size << File.stat(file_name).size.to_s
-  end
-  file_size.max_by(&:length).length
+  file_names.map { |file_name| File.stat(file_name).size.to_s.length }.max
 end
 
 def calculate_width_nlink(file_names)
-  nlink_counts = []
-  file_names.each do |file_name|
-    nlink_counts << File.stat(file_name).nlink.to_s
-  end
-  nlink_counts.max_by(&:length).length
+  file_names.map { |file_name| File.stat(file_name).nlink.to_s.length }.max
 end
 
 def file_type(lstat_mode)
@@ -114,12 +106,7 @@ def file_type(lstat_mode)
 end
 
 def permissions(lstat_mode)
-  permission = ''
-  permissions = lstat_mode.slice(-3, 3).chars.to_a
-  permissions.each do |n|
-    permission += PERMISSIONS[n]
-  end
-  permission
+  lstat_mode.slice(-3, 3).chars.to_a.map { |n| PERMISSIONS[n] }.join
 end
 
 def names(file_name)
@@ -127,12 +114,12 @@ def names(file_name)
   "#{Etc.getpwuid(ids[0]).name}  #{Etc.getgrgid(ids[1]).name}"
 end
 
-def number_of_links(file_name, width_nlink)
-  File.stat(file_name).nlink.to_s.rjust(width_nlink)
+def number_of_links(file_name)
+  File.stat(file_name).nlink.to_s
 end
 
-def file_size(file_name, width_size)
-  File.stat(file_name).size.to_s.rjust(width_size)
+def file_size(file_name)
+  File.stat(file_name).size.to_s
 end
 
 def last_accessed_time(file_name)
@@ -152,9 +139,9 @@ end
 
 option = {}
 opt = OptionParser.new
-opt.on('-a') { |v| option[:a] = v }
-opt.on('-r') { |v| option[:r] = v }
-opt.on('-l') { |v| option[:l] = v }
+opt.on('-a', 'a') { |v| option[:a] = v }
+opt.on('-r', 'r') { |v| option[:r] = v }
+opt.on('-l', 'l') { |v| option[:l] = v }
 opt.parse!(ARGV)
 
 dir = ARGV[0] || '.'
