@@ -2,17 +2,10 @@
 
 require 'optparse'
 
-def result(option)
-  if ARGV.empty?
-    stdin = [$stdin.read]
-    display(stdin, option)
-  else
-    args = ARGV.map { |file| File.open(file, 'r').read }
-    display(args, option)
-  end
-end
+MINIMUM_WIDTH = 7
 
-def display(files, option)
+def display(option)
+  files = ARGV.empty? ? [$stdin.read] : ARGV.map { |file| File.open(file, 'r').read }
   width = calculate_padding(files)
 
   files.each_with_index do |file, i|
@@ -48,10 +41,8 @@ def display_total(files, option, width)
 end
 
 def calculate_padding(contents)
-  mininum_width = 7
-
   width = contents.map { |content| char_count(content) }.sum.to_s.length
-  [width, mininum_width].max
+  [width, MINIMUM_WIDTH].max
 end
 
 def line_count(contents)
@@ -67,11 +58,10 @@ def char_count(contents)
 end
 
 def char_total
-  file_char_counts = ARGV.map do |file|
+  ARGV.map do |file|
     file_contents = File.open(file, 'r').read
     char_count(file_contents)
-  end
-  file_char_counts.sum
+  end.sum
 end
 
 option = {}
@@ -81,4 +71,4 @@ opt.on('-w', 'w') { |v| option[:w] = v }
 opt.on('-l', 'l') { |v| option[:l] = v }
 opt.parse!(ARGV)
 
-result(option)
+display(option)
