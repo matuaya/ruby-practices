@@ -9,22 +9,30 @@ def display(option)
   width = calculate_padding(files)
 
   files.each_with_index do |file, i|
-    line_count = line_count(file)
-    word_count = word_count(file)
-    char_count = char_count(file)
-
-    result = ''
-    result += " #{line_count.to_s.rjust(width)}" if option[:l]
-    result += " #{word_count.to_s.rjust(width)}" if option[:w]
-    result += " #{char_count.to_s.rjust(width)}" if option[:c]
-    result = " #{line_count.to_s.rjust(width)} #{word_count.to_s.rjust(width)} #{char_count.to_s.rjust(width)}" if option.empty?
-    print result
+    print display_count(file, option, width)
     puts " #{ARGV[i]}"
   end
   return unless files.length > 1
 
   # ファイル数が複数ある場合のトータル数表示
-  display_total(files, option, width)
+  print display_total(files, option, width)
+  puts ' total'
+end
+
+def display_count(file, option, width)
+  line_count = line_count(file)
+  word_count = word_count(file)
+  char_count = char_count(file)
+
+  result = ''
+  if option.empty?
+    result = " #{line_count.to_s.rjust(width)} #{word_count.to_s.rjust(width)} #{char_count.to_s.rjust(width)}"
+  else
+    result += " #{line_count.to_s.rjust(width)}" if option[:l]
+    result += " #{word_count.to_s.rjust(width)}" if option[:w]
+    result += " #{char_count.to_s.rjust(width)}" if option[:c]
+  end
+  result
 end
 
 def display_total(files, option, width)
@@ -32,12 +40,14 @@ def display_total(files, option, width)
   word_total = files.map { |file| file.split(' ').count }.sum
 
   result = ''
-  result += " #{line_total.to_s.rjust(width)}" if option[:l]
-  result += " #{word_total.to_s.rjust(width)}" if option[:w]
-  result += " #{char_total.to_s.rjust(width)}" if option[:c]
-  result = " #{line_total.to_s.rjust(width)} #{word_total.to_s.rjust(width)} #{char_total.to_s.rjust(width)}" if option.empty?
-  print result
-  puts ' total'
+  if option.empty?
+    result = " #{line_total.to_s.rjust(width)} #{word_total.to_s.rjust(width)} #{char_total.to_s.rjust(width)}"
+  else
+    result += " #{line_total.to_s.rjust(width)}" if option[:l]
+    result += " #{word_total.to_s.rjust(width)}" if option[:w]
+    result += " #{char_total.to_s.rjust(width)}" if option[:c]
+  end
+  result
 end
 
 def calculate_padding(contents)
