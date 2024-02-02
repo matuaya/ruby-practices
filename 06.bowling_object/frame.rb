@@ -3,22 +3,34 @@
 require_relative 'shot'
 
 class Frame
-  # フレームがストライクか、スペアか、それ以外かを決める
-  attr_reader :first_shot, :second_shot, :third_shot
+  attr_reader :shots, :score
 
-  def initialize(shots)
-    @first_shot = Shot.new(shots[0]).convert_shot
-    @second_shot = Shot.new(shots[1]).convert_shot
-    @third_shot = Shot.new(shots[2]).convert_shot
+  def initialize(score, frame_number)
+    @shots = Shot.new(score)
+    @frame_number = frame_number
+    @score = @shots.convert_to_int
   end
 
-  def shot_type
-    if @first_shot == 10
-      'strike'
-    elsif @first_shot + @second_shot == 10
-      'spare'
+  def calculate_score(frames)
+    next_frame = frames[@frame_number + 1]
+    after_next_frame = frames[@frame_number + 2]
+
+    next_frame_shots = next_frame.shots if next_frame
+
+    current_frame_score_sum = @score.sum
+
+    if next_frame.nil?
+      current_frame_score_sum
+    elsif @shots.strike?
+      if next_frame_shots.strike? && after_next_frame
+        current_frame_score_sum + next_frame.score[0] + after_next_frame.score[0]
+      else
+        current_frame_score_sum + next_frame.score[0] + next_frame.score[1]
+      end
+    elsif @shots.spare?
+      current_frame_score_sum + next_frame.score[0]
     else
-      'open frame'
+      current_frame_score_sum
     end
   end
 end
