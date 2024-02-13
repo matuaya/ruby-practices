@@ -7,7 +7,11 @@ class Shot
     @pin_count = pin_count
   end
 
-  def convert_to_int
+  def point
     pin_count == 'X' ? 10 : pin_count.to_i
+  end
+
+  def strike?
+    pin_count == 'X'
   end
 end

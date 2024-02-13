@@ -1,43 +1,47 @@
 # frozen_string_literal: true
 
-require_relative 'shot'
-
 class Frame
   attr_reader :shots, :score
 
-  def initialize(shot_pair, frame_number)
-    @shots = shot_pair
+  def initialize(shots, frame_number)
+    @shots = shots
     @frame_number = frame_number
-    @score = @shots.map(&:convert_to_int)
   end
 
   def calculate_score(frames)
-    current_frame = frames[@frame_number]
-    next_frame = frames[@frame_number + 1]
-    after_next_frame = frames[@frame_number + 2]
+    next_frame = next_frame(frames)
+    after_next_frame = after_next_frame(frames)
 
-    current_frame_score_sum = @score.sum
+    current_frame_score_sum = @shots.sum(&:point)
+    next_frame_score = next_frame.shots.map(&:point) if next_frame
+    after_next_frame_score = after_next_frame.shots.map(&:point) if after_next_frame
 
     if next_frame.nil?
       current_frame_score_sum
-    elsif current_frame.strike?
-      if next_frame.strike? && after_next_frame
-        current_frame_score_sum + next_frame.score[0] + after_next_frame.score[0]
+    elsif @shots[0].strike?
+      if next_frame.shots[0].strike? && after_next_frame
+        current_frame_score_sum + next_frame_score[0] + after_next_frame_score[0]
       else
-        current_frame_score_sum + next_frame.score[0] + next_frame.score[1]
+        current_frame_score_sum + next_frame_score[0] + next_frame_score[1]
       end
-    elsif current_frame.spare?
-      current_frame_score_sum + next_frame.score[0]
+    elsif spare?
+      current_frame_score_sum + next_frame_score[0]
     else
       current_frame_score_sum
     end
   end
 
-  def strike?
-    @score[0] == 10
-  end
-
   def spare?
-    @score.sum == 10
+    @shots.sum(&:point) == 10
   end
+end
+
+private
+
+def next_frame(frames)
+  frames[@frame_number + 1]
+end
+
+def after_next_frame(frames)
+  frames[@frame_number + 2]
 end
