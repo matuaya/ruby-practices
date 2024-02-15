@@ -15,18 +15,7 @@ class Game
   private
 
   def generate_frames(result)
-    pin_counts = result.split(',')
-
-    all_shots = []
-    pin_counts.each do |pin_count|
-      shot = Shot.new(pin_count)
-      if all_shots.size < FINAL_FRAME_SHOT && shot.strike?
-        all_shots << shot
-        all_shots << Shot.new('0')
-      else
-        all_shots << shot
-      end
-    end
+    all_shots = generate_shots(result)
 
     frames = []
     final_frame_shots = []
@@ -39,6 +28,22 @@ class Game
     end
     frames << Frame.new(final_frame_shots, FINAL_FRAME)
     frames
+  end
+
+  def generate_shots(result)
+    pin_counts = result.split(',')
+
+    all_shots = []
+    pin_counts.each do |pin_count|
+      shot = Shot.new(pin_count)
+      if all_shots.size < FINAL_FRAME_SHOT && shot.strike?
+        all_shots << shot
+        all_shots << Shot.new('0')
+      else
+        all_shots << shot
+      end
+    end
+    all_shots
   end
 end
 
