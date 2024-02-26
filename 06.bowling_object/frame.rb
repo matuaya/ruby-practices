@@ -9,7 +9,7 @@ class Frame
   def calculate_score(frames)
     next_frame = frames[@frame_number + 1]
 
-    return points_sum if next_frame.nil?
+    return points.sum if next_frame.nil?
 
     bonus_point =
       if strike?
@@ -19,7 +19,7 @@ class Frame
         spare_points(next_frame)
       end
 
-    points_sum + bonus_point.to_i
+    points.sum + bonus_point.to_i
   end
 
   def points
@@ -31,10 +31,6 @@ class Frame
   end
 
   private
-
-  def points_sum
-    points.sum
-  end
 
   def strike_points(next_frame, after_next_frame)
     if next_frame.strike? && after_next_frame
@@ -49,6 +45,6 @@ class Frame
   end
 
   def spare?
-    !strike? && points_sum == 10
+    !strike? && points.sum == 10
   end
 end
