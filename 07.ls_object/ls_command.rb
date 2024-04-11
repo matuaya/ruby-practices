@@ -3,8 +3,9 @@
 require_relative 'basic_format'
 
 class LsCommand
-  def initialize(path)
+  def initialize(path, options)
     @path = path
+    @options = options
   end
 
   def display
@@ -15,7 +16,8 @@ class LsCommand
 
   def file_paths
     file_pattern = File.join(@path, '*')
-    Dir.glob(file_pattern)
+    file_paths = @options[:a] ? Dir.glob(file_pattern, File::FNM_DOTMATCH) : Dir.glob(file_pattern)
+    @options[:r] ? file_paths.reverse : file_paths
   end
 
   def formatter
