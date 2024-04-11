@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'etc'
+
 class FileInfo
   def initialize(file_path)
     @file_path = file_path
