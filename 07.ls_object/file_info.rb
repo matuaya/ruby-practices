@@ -2,6 +2,9 @@
 
 require 'etc'
 
+PERMISSIONS = { '0' => '---', '1' => '--x', '2' => '-w-', '3' => '-wx',
+                '4' => 'r--', '5' => 'r-x', '6' => 'rw-', '7' => 'rwx' }.freeze
+
 class FileInfo
   def initialize(file_path)
     @file_path = file_path
