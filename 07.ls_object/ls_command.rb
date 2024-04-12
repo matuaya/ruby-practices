@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'basic_format'
+require_relative 'detailed_format'
 
 class LsCommand
   def initialize(path, options)
@@ -21,6 +22,6 @@ class LsCommand
   end
 
   def formatter
-    BasicFormat.new(file_paths)
+    @options[:l] ? DetailedFormat.new(file_paths) : BasicFormat.new(file_paths)
   end
 end
