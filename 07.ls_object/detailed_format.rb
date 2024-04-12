@@ -9,7 +9,7 @@ class DetailedFormat < BasicFormat
       "#{file.user.rjust(maxes[:user])}  #{file.group.to_s.rjust(maxes[:group])}  "\
       "#{file.size.to_s.rjust(maxes[:size])} "\
       "#{file.last_access_time} #{file.base_name}"\
-      "#{" -> #{File.readlink(file.base_name)}" if file.symlink?}"
+      "#{" -> #{File.readlink(file.file_path)}" if file.symlink?}"
     end
   end
 
