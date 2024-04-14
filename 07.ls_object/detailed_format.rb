@@ -13,6 +13,10 @@ class DetailedFormat < BasicFormat
     end
   end
 
+  def calculate_total_blocks
+    @files.sum(&:blocks)
+  end
+
   private
 
   def max_lengths

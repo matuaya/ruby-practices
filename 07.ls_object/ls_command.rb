@@ -10,6 +10,7 @@ class LsCommand
   end
 
   def display
+    puts "total #{formatter.calculate_total_blocks}" if @options[:l]
     puts formatter.format_lines
   end
 

@@ -56,6 +56,10 @@ class FileInfo
     mode_num[0, 2] == '12'
   end
 
+  def blocks
+    file_stat.blocks
+  end
+
   private
 
   def file_stat
