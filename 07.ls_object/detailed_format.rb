@@ -3,12 +3,7 @@
 class DetailedFormat < BasicFormat
   def format_lines
     @files.map do |file|
-      "#{file.type}#{file.mode}  "\
-      "#{file.link_num.to_s.rjust(max_lengths[:nlink])} "\
-      "#{file.user.rjust(max_lengths[:user])}  #{file.group.to_s.rjust(max_lengths[:group])}  "\
-      "#{file.size.to_s.rjust(max_lengths[:size])} "\
-      "#{file.last_access_time} #{file.base_name}"\
-      "#{" -> #{File.readlink(file.file_path)}" if file.symlink?}"
+      file.full_info_format(max_lengths)
     end
   end
 

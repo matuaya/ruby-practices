@@ -60,6 +60,15 @@ class FileInfo
     file_stat.blocks
   end
 
+  def full_info_format(max_lengths)
+      "#{type}#{mode}  "\
+      "#{link_num.to_s.rjust(max_lengths[:nlink])} "\
+      "#{user.rjust(max_lengths[:user])}  #{group.to_s.rjust(max_lengths[:group])}  "\
+      "#{size.to_s.rjust(max_lengths[:size])} "\
+      "#{last_access_time} #{base_name}"\
+      "#{" -> #{File.readlink(file_path)}" if symlink?}"
+  end
+
   private
 
   def file_stat
