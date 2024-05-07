@@ -23,13 +23,12 @@ class BasicFormat
   def files_grouped_into_lines
     total_line_count = (@files.size.to_f / COLUMN_NUM).ceil
     files_sliced = @files.each_slice(total_line_count).to_a
-
-    lines = Array.new(total_line_count) { [] }
-    lines.each_with_index do |line, index|
-      files_sliced.each do |files|
-        line << files[index] if files[index]
-      end
-    end
+    
+    lines = total_line_count.times.map { |index|
+      files_sliced.map do |files|
+        files[index]
+      end.compact
+    }
 
     lines
   end
