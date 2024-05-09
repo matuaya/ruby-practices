@@ -6,8 +6,6 @@ PERMISSIONS = { '0' => '---', '1' => '--x', '2' => '-w-', '3' => '-wx',
                 '4' => 'r--', '5' => 'r-x', '6' => 'rw-', '7' => 'rwx' }.freeze
 
 class FileInfo
-  attr_reader :file_path
-
   def initialize(file_path)
     @file_path = file_path
   end
@@ -66,7 +64,7 @@ class FileInfo
     "#{user.rjust(max_lengths[:user])}  #{group.to_s.rjust(max_lengths[:group])}  "\
     "#{size.to_s.rjust(max_lengths[:size])} "\
     "#{last_access_time} #{base_name}"\
-    "#{" -> #{File.readlink(file_path)}" if symlink?}"
+    "#{" -> #{File.readlink(@file_path)}" if symlink?}"
   end
 
   private
