@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'basic_format'
+
 class DetailedFormat < BasicFormat
   def format_lines
     @files.map do |file|
