@@ -20,13 +20,9 @@ class ShortFormat < BasicFormat
     total_line_count = (@files.size.to_f / COLUMN_NUM).ceil
     files_sliced = @files.each_slice(total_line_count).to_a
 
-    lines = total_line_count.times.map { |index|
-      files_sliced.map do |files|
-        files[index]
-      end.compact
-    }
-
-    lines
+    total_line_count.times.map do |index|
+      files_sliced.map { |files| files[index] }.compact
+    end
   end
 
   def max_length
